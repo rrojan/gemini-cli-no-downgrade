@@ -226,7 +226,7 @@ const App = ({ config, settings, startupWarnings = [] }: AppProps) => {
 
     // Check immediately and then periodically
     checkModelChange();
-    const interval = setInterval(checkModelChange, 1000); // Check every second
+    const interval = setInterval(checkModelChange, 100 * 1000); // Reduce the model swap check frequency to 100s instead of 1s
 
     return () => clearInterval(interval);
   }, [config, currentModel]);
@@ -241,13 +241,11 @@ const App = ({ config, settings, startupWarnings = [] }: AppProps) => {
       addItem(
         {
           type: MessageType.INFO,
-          text: `⚡ Slow response times detected. Automatically switching from ${currentModel} to ${fallbackModel} for faster responses for the remainder of this session.
-⚡ To avoid this you can utilize a Gemini API Key. See: https://goo.gle/gemini-cli-docs-auth#gemini-api-key
-⚡ You can switch authentication methods by typing /auth`,
+          text: `⚡ Slow response times detected. Waiting up on ${currentModel} instead of falling back to ${fallbackModel}.`,
         },
         Date.now(),
       );
-      return true; // Always accept the fallback
+      return false; // NEVER accept the fallback
     };
 
     config.setFlashFallbackHandler(flashFallbackHandler);
